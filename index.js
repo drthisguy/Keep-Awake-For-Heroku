@@ -1,5 +1,5 @@
 const inquirer = require("inquirer"),
-    colors = require("console-colors-2"),
+    // colors = require("console-colors-2"),
     axios = require("axios");
 
 'use strict';
