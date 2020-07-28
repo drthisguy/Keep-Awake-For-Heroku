@@ -1,0 +1,24 @@
+{
+  "name": "keep-heroku-alive",
+  "version": "1.0.0",
+  "description": "CLI intended to keep Heroku applications loaded on the server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drthisguy/Keep-Heroku-Alive"
+  },
+  "author": "Page Tyler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drthisguy/Keep-Heroku-Alive/issues"
+  },
+  "homepage": "https://github.com/drthisguy/Keep-Heroku-Alive",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "inquirer": "^7.0.4"
+  }
+}
