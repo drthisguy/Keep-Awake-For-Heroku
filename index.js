@@ -16,7 +16,7 @@ const inquirer = require("inquirer"),
       type: "list",
       name: "schedule",
       message: "On which schedule would you like to keep your site loaded to the server?",
-      choices: ["Weekday Working Hours (8am-5pm)", separator,"Full Weekdays (8am-9pm)", separator, "Weekdays (24hr)", separator, "24hr/7days a Week", end]
+      choices: ["Weekday Working Hours (8am-5pm)", separator,"Full Weekdays (8am-8pm)", separator, "Weekdays (24hrs/day)", separator, "24hr/7days a Week", end]
       }
     ])
   })().then( answers => scheduleCalls(answers))
@@ -25,21 +25,29 @@ const inquirer = require("inquirer"),
 const scheduleCalls = ({ site, schedule }) => {
     let conditions;
     switch (schedule) {
-        case"Weekday Working Hours (8am-5pm)":
+        case "Weekday Working Hours (8am-5pm)":
 
-            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 9 && now.getHours() < 17)"
-            runSchedule(site, conditions)
-            break;
+        conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 8 && now.getHours() < 17)"
+        runSchedule(site, conditions)
+        break;
 
-        case"Full Weekdays (8am-9pm)":
+        case "Full Weekdays (8am-8pm)":
 
-            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 9 && now.getHours() < 21)"
-            runSchedule(site, conditions)
-            break;
-    
+        conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 8 && now.getHours() < 20)"
+        runSchedule(site, conditions)
+        break;
+        
+        case "Weekdays (24hrs/day)":
+        
+        conditions = "now.getDay() > 0 && now.getDay() < 6"
+        runSchedule(site, conditions)
+        break;
+        
         default:
-            console.log('hit default')
-            break;
+
+        conditions = "() => true;"
+        runSchedule(site, conditions)
+        break;
     }
 }
 
