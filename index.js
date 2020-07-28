@@ -4,7 +4,7 @@ const inquirer = require("inquirer"),
     // prompt users: 
 (() => {
     const separator = new inquirer.Separator(),
-          end = new inquirer.Separator('******END******');
+          end = new inquirer.Separator('****************');
   
     return inquirer.prompt([
       {
@@ -23,9 +23,18 @@ const inquirer = require("inquirer"),
   .catch( err => console.log(err)) 
 
 const scheduleCalls = ({ site, schedule }) => {
+    let conditions;
     switch (schedule) {
         case"Weekday Working Hours (8am-5pm)":
-            runSchedule(site)
+
+            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 9 && now.getHours() < 17)"
+            runSchedule(site, conditions)
+            break;
+
+        case"Full Weekdays (8am-9pm)":
+
+            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 9 && now.getHours() < 21)"
+            runSchedule(site, conditions)
             break;
     
         default:
@@ -34,18 +43,18 @@ const scheduleCalls = ({ site, schedule }) => {
     }
 }
 
-const runSchedule = url => {
+const runSchedule = (url, conditions) => {
     
     const loadSite = async () => {
         const now = new Date();
-        if ((now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 9 && now.getHours() < 16)) {
+        if (eval(conditions)) {
             
-            const awaken = await axios.get("https://pennypincha.herokuapp.com")
-            console.log('hit', awaken);
+            await axios.get("https://pennypincha.herokuapp.com")
+            console.log(`${url} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`)
         }
     }
 
     setInterval(() => {
         loadSite()
-    }, 10000);
+    }, 5000);
 }
