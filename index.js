@@ -1,10 +1,12 @@
 const inquirer = require("inquirer"),
+    colors = require("console-colors-2"),
     axios = require("axios");
 
-    // prompt users: 
+'use strict';
+
+// prompt users: 
 (() => {
-    const separator = new inquirer.Separator(),
-          end = new inquirer.Separator('****************');
+    const separator = new inquirer.Separator();
   
     return inquirer.prompt([
       {
@@ -15,15 +17,16 @@ const inquirer = require("inquirer"),
       {
       type: "list",
       name: "schedule",
-      message: "On which schedule would you like to keep your site loaded to the server?",
-      choices: ["Weekday Working Hours (8am-5pm)", separator,"Full Weekdays (8am-8pm)", separator, "Weekdays (24hrs/day)", separator, "24hr/7days a Week", end]
+      message: "On which schedule would you like to keep your site loaded to the server?\n",
+      choices: ["Weekday Working Hours (8am-5pm)", separator,"Full Weekdays (8am-8pm)", separator, "Weekdays (24hrs/day)", separator, "24hr/7days a Week\n"]
       }
     ])
   })().then( answers => scheduleCalls(answers))
   .catch( err => console.log(err)) 
 
-const scheduleCalls = ({ site, schedule }) => {
+const scheduleCalls = ({ schedule, site }) => {
     let conditions;
+
     switch (schedule) {
         case "Weekday Working Hours (8am-5pm)":
 
@@ -47,22 +50,21 @@ const scheduleCalls = ({ site, schedule }) => {
 
         conditions = "() => true;"
         runSchedule(site, conditions)
-        break;
     }
 }
 
 const runSchedule = (url, conditions) => {
-    
+
     const loadSite = async () => {
         const now = new Date();
         if (eval(conditions)) {
             
-            await axios.get("https://pennypincha.herokuapp.com")
+            await axios.get(url)
             console.log(`${url} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`)
         }
     }
 
     setInterval(() => {
         loadSite()
-    }, 5000);
+    }, 1740000);
 }
