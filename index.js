@@ -3,9 +3,11 @@ const inquirer = require("inquirer"),
     axios = require("axios");
     
 'use strict';
-const line = new inquirer.Separator();
+const line = new inquirer.Separator(),
+    { sp: { reset } } = colors,
+    { fg: color } = colors;
 
-// prompt users: 
+// prompt user: 
 (() => {
     console.clear();
     return inquirer.prompt(
@@ -13,8 +15,8 @@ const line = new inquirer.Separator();
         type: "rawlist",
         name: "program",
         prefix: '*',
-        message: `${colors.fg.green}Keep Heroku Alive.${colors.sp.reset} \n${line}\n Welcome`,
-        choices: ["Start pinging a new page?", `${colors.fg.red}Quit Keep Alive${colors.sp.reset}`]
+        message: `\n${color.green}Keep Heroku Alive.${reset} \n${line}\n Welcome`,
+        choices: ["Start pinging a new page?", `${color.red}Quit Keep Alive${reset}`]
         }
     )
   })().then(({ program }) => {
@@ -22,7 +24,7 @@ const line = new inquirer.Separator();
         promptSchedule();
       }
         else {
-            console.log(`${colors.fg.blue}Have a great day!${colors.sp.reset}`);
+            console.log(`${color.blue}Have a great day!${reset}`);
             process.exit([0]);
         }
     })
@@ -66,7 +68,7 @@ const runSchedule = (url, conditions) => {
         if (eval(conditions)) {
             
             await axios.get(url)
-            console.log(`${colors.fg.green+url+colors.sp.reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`)
+            console.log(`${color.green + url + reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`)
         }
       } catch (err) {console.log(err)}
     }
@@ -74,6 +76,7 @@ const runSchedule = (url, conditions) => {
     setInterval(() => {
         loadSite()
     }, 5000);
+    promptAdd();
 }, 
 
 promptSchedule = () => {
@@ -92,5 +95,24 @@ promptSchedule = () => {
         }
       ])
     .then( answers => scheduleCalls(answers))
+    .catch( err => console.log(err)) 
+},
+
+promptAdd = () => {
+
+    return inquirer.prompt([
+        {
+        type: "confirm",
+        name: "add",
+        message: "Would you like to keep another website awake?\n"
+        }
+      ])
+    .then(({ add }) => {
+        if(add){
+            promptSchedule();
+        } else {
+            console.log(`${color.blue}Terrific!${reset} \n We'll keep this going then...`)
+        }
+    })
     .catch( err => console.log(err)) 
 }
