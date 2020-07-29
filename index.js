@@ -1,12 +1,12 @@
 const inquirer = require("inquirer"),
     colors = require("console-colors-2"),
-    ioHook = require('iohook'),
+    keypress = require('keypress'),
     axios = require("axios");
     
 'use strict';
+
 const line = new inquirer.Separator(),
-    { sp: { reset } } = colors,
-    { fg: color } = colors;
+    { fg: color, sp: { reset } } = colors;
 
 // prompt user: 
 (() => {
@@ -78,16 +78,21 @@ const runSchedule = (url, conditions) => {
     setInterval(() => {
         loadSite()
     }, 5000);
-    ioHook.start();
+    runEventListeners();
+},
+
+runEventListeners = () => {
+
+    process.stdin.on('keypress', function (ch, key) {
+        console.log('got "keypress"', key);
+        if (key && key.ctrl && key.name == 'c') {
+            process.stdin.pause();
+        }
+    });
 }
     
-ioHook.on("keyup", event => {
-    const { keycode } = event;
-    if(keycode) {
-        console.log(`${color.blue}Have a great day!${reset}`);
-        process.exit([0]);
-    }
-})
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
 
 const promptSchedule = () => {
 
