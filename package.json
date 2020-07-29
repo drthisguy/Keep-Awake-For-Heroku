@@ -19,6 +19,7 @@
   "homepage": "https://github.com/drthisguy/Keep-Heroku-Alive",
   "dependencies": {
     "axios": "^0.19.2",
+    "console-colors-2": "^1.0.2",
     "inquirer": "^7.0.4"
   }
 }
