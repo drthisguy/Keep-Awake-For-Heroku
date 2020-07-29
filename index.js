@@ -1,5 +1,6 @@
 const inquirer = require("inquirer"),
     colors = require("console-colors-2"),
+    ioHook = require('iohook'),
     axios = require("axios");
     
 'use strict';
@@ -15,7 +16,7 @@ const line = new inquirer.Separator(),
         type: "rawlist",
         name: "program",
         prefix: '*',
-        message: `\n${color.green}Keep Heroku Alive.${reset} \n${line}\n Welcome`,
+        message: `${color.green}Keep Heroku Alive.${reset} \n${line}\n Welcome`,
         choices: ["Start pinging a new page?", `${color.red}Quit Keep Alive${reset}`]
         }
     )
@@ -73,13 +74,22 @@ const runSchedule = (url, conditions) => {
       } catch (err) {console.log(err)}
     }
     loadSite()
+    promptAdd()
     setInterval(() => {
         loadSite()
     }, 5000);
-    promptAdd();
-}, 
+    ioHook.start();
+}
+    
+ioHook.on("keyup", event => {
+    const { keycode } = event;
+    if(keycode) {
+        console.log(`${color.blue}Have a great day!${reset}`);
+        process.exit([0]);
+    }
+})
 
-promptSchedule = () => {
+const promptSchedule = () => {
 
     return inquirer.prompt([
         {
@@ -104,14 +114,15 @@ promptAdd = () => {
         {
         type: "confirm",
         name: "add",
-        message: "Would you like to keep another website awake?\n"
+        message: "Would you like to keep another website awake?"
         }
       ])
     .then(({ add }) => {
         if(add){
             promptSchedule();
         } else {
-            console.log(`${color.blue}Terrific!${reset} \n We'll keep this going then...`)
+            console.clear()
+            console.log(`${color.cyan}Terrific!${reset} \n We'll keep this going then...`)
         }
     })
     .catch( err => console.log(err)) 
