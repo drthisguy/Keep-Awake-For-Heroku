@@ -1,16 +1,14 @@
 const inquirer = require("inquirer"),
     colors = require("console-colors-2"),
-    readline = require('readline'),
     axios = require("axios");
     
 'use strict';
 
-readline.emitKeypressEvents(process.stdin);
 const line = new inquirer.Separator(),
     { fg: color, sp: { reset } } = colors;
 
 // prompt user: 
-(start = () => {
+const start = () => {
     console.clear();
     return inquirer.prompt(
         {
@@ -21,7 +19,7 @@ const line = new inquirer.Separator(),
         choices: ["Start pinging a new page?", `${color.red}Quit Keep Awake${reset}`]
         }
     )
-  })().then(({ program }) => {
+  .then(({ program }) => {
       if (program === "Start pinging a new page?") {
         promptSchedule();
       }
@@ -31,7 +29,8 @@ const line = new inquirer.Separator(),
         }
     })
   .catch( err => console.log(err)) 
-
+}
+start();
 const scheduleCalls = ({ schedule, site }) => {
     let conditions;
 
@@ -53,11 +52,15 @@ const scheduleCalls = ({ schedule, site }) => {
         conditions = "now.getDay() > 0 && now.getDay() < 6"
         runSchedule(site, conditions)
         break;
-        
-        default:
 
+        case "24hr/7days a Week":
+        
         conditions = "() => true;"
         runSchedule(site, conditions)
+        break;
+        
+        default:
+        start();
     }
 }
 
@@ -76,9 +79,14 @@ const runSchedule = (url, conditions) => {
     }
     loadSite()
     instructUser()
+
     setInterval(() => {
         loadSite()
-    }, 5000);
+    }, 1740000);
+    setInterval(() => {
+        instructUser()
+    }, 86400000);
+
     loadEventListeners();
 }
 
@@ -88,7 +96,6 @@ function loadEventListeners() {
 
     process.stdin.on('keypress', (ch, key) => {
         const { ctrl, name } = key;
-        console.log("runSchedule -> key", key, ctrl)
         
         if (ctrl && name === 'n') {
             promptAdd();
@@ -112,10 +119,10 @@ promptSchedule = () => {
         message: "Type in the URL for the website you would like to keep active\n"
         },
         {
-        type: "rawlist",
+        type: "list",
         name: "schedule",
         message: "On which schedule would you like to keep your site loaded to the server?\n",
-        choices: ["Weekday Working Hours (8am-5pm)", line,"Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week\n"]
+        choices: ["Weekday Working Hours (8am-5pm)", line, "Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week", line, "Return to Main Menu", line]
         }
       ])
     .then( answers => scheduleCalls(answers))
