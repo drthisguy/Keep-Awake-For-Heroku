@@ -31,6 +31,7 @@ const start = () => {
   .catch( err => console.log(err)) 
 }
 start();
+
 const scheduleCalls = ({ schedule, site }) => {
     let conditions;
 
@@ -88,8 +89,13 @@ const runSchedule = (url, conditions) => {
     }, 86400000);
 
     loadEventListeners();
+},
+
+instructUser = () => {
+    console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.green}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
 }
 
+//Arrow functions won't properly here. 
 function loadEventListeners() {
     process.stdin.setRawMode(true);
     process.stdin.resume()
@@ -107,9 +113,6 @@ function loadEventListeners() {
     })
 }
 
-const instructUser = () => {
-    console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.green}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
-}
 promptSchedule = () => {
 
     return inquirer.prompt([
