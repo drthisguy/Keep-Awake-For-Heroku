@@ -1,23 +1,24 @@
 const inquirer = require("inquirer"),
     colors = require("console-colors-2"),
-    keypress = require('keypress'),
+    readline = require('readline'),
     axios = require("axios");
     
 'use strict';
 
+readline.emitKeypressEvents(process.stdin);
 const line = new inquirer.Separator(),
     { fg: color, sp: { reset } } = colors;
 
 // prompt user: 
-(() => {
+(start = () => {
     console.clear();
     return inquirer.prompt(
         {
         type: "rawlist",
         name: "program",
         prefix: '*',
-        message: `${color.green}Keep Heroku Alive.${reset} \n${line}\n Welcome`,
-        choices: ["Start pinging a new page?", `${color.red}Quit Keep Alive${reset}`]
+        message: `${color.green}Keep Awake for Heroku Apps.${reset} \n${line}\n Welcome`,
+        choices: ["Start pinging a new page?", `${color.red}Quit Keep Awake${reset}`]
         }
     )
   })().then(({ program }) => {
@@ -26,7 +27,7 @@ const line = new inquirer.Separator(),
       }
         else {
             console.log(`${color.blue}Have a great day!${reset}`);
-            process.exit([0]);
+            process.exit();
         }
     })
   .catch( err => console.log(err)) 
@@ -74,27 +75,35 @@ const runSchedule = (url, conditions) => {
       } catch (err) {console.log(err)}
     }
     loadSite()
-    promptAdd()
+    instructUser()
     setInterval(() => {
         loadSite()
     }, 5000);
-    runEventListeners();
-},
-
-runEventListeners = () => {
-
-    process.stdin.on('keypress', function (ch, key) {
-        console.log('got "keypress"', key);
-        if (key && key.ctrl && key.name == 'c') {
-            process.stdin.pause();
-        }
-    });
+    loadEventListeners();
 }
-    
-  process.stdin.setRawMode(true);
-  process.stdin.resume();
 
-const promptSchedule = () => {
+function loadEventListeners() {
+    process.stdin.setRawMode(true);
+    process.stdin.resume()
+
+    process.stdin.on('keypress', (ch, key) => {
+        const { ctrl, name } = key;
+        console.log("runSchedule -> key", key, ctrl)
+        
+        if (ctrl && name === 'n') {
+            promptAdd();
+        } 
+        if (name === 'escape') {
+            console.log(`${color.blue}Have a great day!${reset}`);
+            process.exit();
+        } 
+    })
+}
+
+const instructUser = () => {
+    console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.green}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
+}
+promptSchedule = () => {
 
     return inquirer.prompt([
         {
@@ -114,6 +123,7 @@ const promptSchedule = () => {
 },
 
 promptAdd = () => {
+    console.clear();
 
     return inquirer.prompt([
         {
@@ -126,8 +136,8 @@ promptAdd = () => {
         if(add){
             promptSchedule();
         } else {
-            console.clear()
             console.log(`${color.cyan}Terrific!${reset} \n We'll keep this going then...`)
+            loadEventListeners();
         }
     })
     .catch( err => console.log(err)) 
