@@ -5,7 +5,9 @@ const inquirer = require("inquirer"),
 'use strict';
 
 const line = new inquirer.Separator(),
-    { fg: color, sp: { reset } } = colors;
+    { fg: color, sp: { reset } } = colors,
+    instances = [];
+    
 
 // prompt user: 
 const start = () => {
@@ -16,11 +18,11 @@ const start = () => {
         name: "program",
         prefix: '*',
         message: `${color.green}Keep Awake for Heroku Apps.${reset} \n${line}\n Welcome`,
-        choices: ["Start pinging a new page?", `${color.red}Quit Keep Awake${reset}`]
+        choices: ["Set up a keep awake Schedule to for your website?", `${color.red}Quit Keep Awake${reset}`]
         }
     )
   .then(({ program }) => {
-      if (program === "Start pinging a new page?") {
+      if (program === "Set up a keep awake Schedule to for your website?") {
         promptSchedule();
       }
         else {
@@ -33,6 +35,7 @@ const start = () => {
 start();
 
 const scheduleCalls = ({ schedule, site }) => {
+    instances.push({schedule, site})
     let conditions;
 
     switch (schedule) {
@@ -74,7 +77,7 @@ const runSchedule = (url, conditions) => {
         if (eval(conditions)) {
             
             await axios.get(url)
-            console.log(`${color.green + url + reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`)
+            console.log(`${color.green + url + reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`)
         }
       } catch (err) {console.log(err)}
     }
@@ -84,18 +87,23 @@ const runSchedule = (url, conditions) => {
     setInterval(() => {
         loadSite()
     }, 1740000);
-    setInterval(() => {
-        instructUser()
-    }, 86400000);
-
+   
     loadEventListeners();
 },
 
 instructUser = () => {
-    console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.green}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
+    const interval = 43200000/instances.length, 
+
+    printOut = () => {
+    console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.cyan}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
+    }
+    printOut();
+    setInterval(() => {
+        printOut()
+    }, interval);
 }
 
-//Arrow functions won't properly here. 
+//Arrow functions won't work properly here. 
 function loadEventListeners() {
     process.stdin.setRawMode(true);
     process.stdin.resume()
@@ -119,7 +127,7 @@ promptSchedule = () => {
         {
         type: "input",
         name: "site",
-        message: "Type in the URL for the website you would like to keep active\n"
+        message: "Type in the URL for the website you would like to keep awake\n"
         },
         {
         type: "list",
@@ -139,7 +147,7 @@ promptAdd = () => {
         {
         type: "confirm",
         name: "add",
-        message: "Would you like to keep another website awake?"
+        message: "Would you like to add another site to keep awake?"
         }
       ])
     .then(({ add }) => {
