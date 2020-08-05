@@ -5,8 +5,7 @@ const inquirer = require("inquirer"),
 'use strict';
 
 const line = new inquirer.Separator(),
-    { fg: color, sp: { reset } } = colors,
-    instances = [];
+    { fg: color, sp: { reset } } = colors;
     
 
 // prompt user: 
@@ -35,7 +34,6 @@ const start = () => {
 start();
 
 const scheduleCalls = ({ schedule, site }) => {
-    instances.push({schedule, site})
     let conditions;
 
     switch (schedule) {
@@ -92,7 +90,6 @@ const runSchedule = (url, conditions) => {
 },
 
 instructUser = () => {
-    const interval = 43200000/instances.length, 
 
     printOut = () => {
     console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.cyan}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
@@ -100,7 +97,7 @@ instructUser = () => {
     printOut();
     setInterval(() => {
         printOut()
-    }, interval);
+    }, 43200000);
 }
 
 //Arrow functions won't work properly here. 
