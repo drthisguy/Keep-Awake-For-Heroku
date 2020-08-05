@@ -5,7 +5,8 @@ const inquirer = require("inquirer"),
 'use strict';
 
 const line = new inquirer.Separator(),
-    { fg: color, sp: { reset } } = colors;
+    { fg: color, sp: { reset } } = colors,
+    instances = [];
     
 
 // prompt user: 
@@ -17,11 +18,11 @@ const start = () => {
         name: "program",
         prefix: '*',
         message: `${color.green}Keep Awake for Heroku Apps.${reset} \n${line}\n Welcome`,
-        choices: ["Set up a keep awake Schedule to for your website?", `${color.red}Quit Keep Awake${reset}`]
+        choices: ["Set up a keep awake Schedule to for your website(s)?", `${color.red}Quit Keep Awake${reset}`]
         }
     )
   .then(({ program }) => {
-      if (program === "Set up a keep awake Schedule to for your website?") {
+      if (program === "Set up a keep awake Schedule to for your website(s)?") {
         promptSchedule();
       }
         else {
@@ -33,37 +34,39 @@ const start = () => {
 }
 start();
 
-const scheduleCalls = ({ schedule, site }) => {
+const scheduleCalls = () => {
     let conditions;
 
-    switch (schedule) {
-        case "Weekday Working Hours (8am-5pm)":
+    instances.forEach( run => {
+        const { schedule, site } = run; 
 
-        conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 7 && now.getHours() < 17)"
-        runSchedule(site, conditions)
-        break;
+        switch (schedule) {
+            case "Weekday Working Hours (8am-5pm)":
 
-        case "Full Weekdays (8am-8pm)":
+            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 7 && now.getHours() < 17)"
+            break;
 
-        conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 7 && now.getHours() < 20)"
-        runSchedule(site, conditions)
-        break;
-        
-        case "Weekdays (24hrs/day)":
-        
-        conditions = "now.getDay() > 0 && now.getDay() < 6"
-        runSchedule(site, conditions)
-        break;
+            case "Full Weekdays (8am-8pm)":
 
-        case "24hr/7days a Week":
-        
-        conditions = "() => true;"
+            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 7 && now.getHours() < 20)"
+            break;
+            
+            case "Weekdays (24hrs/day)":
+            
+            conditions = "now.getDay() > 0 && now.getDay() < 6"
+            break;
+
+            case "24hr/7days a Week":
+            
+            conditions = "() => true;"
+            break;
+            
+            default:
+            start();
+        }
         runSchedule(site, conditions)
-        break;
-        
-        default:
-        start();
-    }
+    })
+    instructUser();
 }
 
 const runSchedule = (url, conditions) => {
@@ -80,7 +83,7 @@ const runSchedule = (url, conditions) => {
       } catch (err) {console.log(err)}
     }
     loadSite()
-    instructUser()
+    
 
     setInterval(() => {
         loadSite()
@@ -90,6 +93,7 @@ const runSchedule = (url, conditions) => {
 },
 
 instructUser = () => {
+    const interval = 43200000/instances.length
 
     printOut = () => {
     console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.cyan}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
@@ -97,7 +101,7 @@ instructUser = () => {
     printOut();
     setInterval(() => {
         printOut()
-    }, 43200000);
+    }, interval);
 }
 
 //Arrow functions won't work properly here. 
@@ -119,6 +123,7 @@ function loadEventListeners() {
 }
 
 promptSchedule = () => {
+console.clear()
 
     return inquirer.prompt([
         {
@@ -133,8 +138,28 @@ promptSchedule = () => {
         choices: ["Weekday Working Hours (8am-5pm)", line, "Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week", line, "Return to Main Menu", line]
         }
       ])
-    .then( answers => scheduleCalls(answers))
+    .then( async answers => {
+        instances.push(answers)
+
+        const { more } = await promptMore()
+
+        if (more) {
+            promptSchedule()
+        } else {
+            scheduleCalls()
+        }
+    })
     .catch( err => console.log(err)) 
+},
+
+promptMore = () => {
+    return inquirer.prompt([
+        {
+        type: "confirm",
+        name: "more",
+        message: 'Would you like to add any more sites to keep awake? \n Type "no" to begin monitoring'
+        }
+      ])
 },
 
 promptAdd = () => {
