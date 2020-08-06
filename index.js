@@ -80,7 +80,7 @@ const runSchedule = (url, conditions) => {
             await axios.get(url)
             console.log(`${color.green + url + reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`)
         }
-      } catch (err) {console.log(err)}
+      } catch (err) {`${color.red + url + reset} failed on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`}
     }
     loadSite()
     
@@ -93,7 +93,7 @@ const runSchedule = (url, conditions) => {
 },
 
 instructUser = () => {
-    const interval = 43200000/instances.length
+    const interval = 86400000/instances.length
 
     printOut = () => {
     console.log(`\nPress "${color.red}Esc${reset}" to quit. \nOr press "${color.cyan}Ctrl + n${reset}" to add another site to Keep Awake.\n`)
@@ -134,13 +134,16 @@ console.clear()
         {
         type: "list",
         name: "schedule",
-        message: "On which schedule would you like to keep your site loaded to the server?\n",
+        message: "On which schedule would you like to keep your site loaded to the server?\n\n",
         choices: ["Weekday Working Hours (8am-5pm)", line, "Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week", line, "Return to Main Menu", line]
         }
       ])
     .then( async answers => {
         instances.push(answers)
 
+        if (answers.schedule === 'Return to Main Menu') {
+            start();
+        } else {        
         const { more } = await promptMore()
 
         if (more) {
@@ -148,11 +151,14 @@ console.clear()
         } else {
             scheduleCalls()
         }
+        }
     })
     .catch( err => console.log(err)) 
 },
 
 promptMore = () => {
+    console.clear();
+
     return inquirer.prompt([
         {
         type: "confirm",
