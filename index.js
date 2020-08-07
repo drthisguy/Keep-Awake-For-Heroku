@@ -80,7 +80,9 @@ const runSchedule = (url, conditions) => {
             await axios.get(url)
             console.log(`${color.green + url + reset} pinged successfully on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`)
         }
-      } catch (err) {`${color.red + url + reset} failed on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`}
+      } catch (err) {
+          console.log(`${color.red + url + reset} failed on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}\n`)
+        }
     }
     loadSite()
     
