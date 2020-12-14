@@ -137,7 +137,7 @@ console.clear()
         type: "list",
         name: "schedule",
         message: "On which schedule would you like to keep your site loaded to the server?\n\n",
-        choices: ["Weekday Working Hours (8am-5pm)", line, "Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week", line, "Return to Main Menu", line]
+        choices: ["Weekday Working Hours (7am-5pm)", line, "Full Weekdays (8am-8pm)", line, "Weekdays (24hrs/day)", line, "24hr/7days a Week", line, "Return to Main Menu", line]
         }
       ])
     .then( async answers => {
