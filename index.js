@@ -41,9 +41,9 @@ const scheduleCalls = () => {
         const { schedule, site } = run; 
 
         switch (schedule) {
-            case "Weekday Working Hours (8am-5pm)":
+            case "Weekday Working Hours (7am-5pm)":
 
-            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 7 && now.getHours() < 17)"
+            conditions = "(now.getDay() > 0 && now.getDay() < 6) && (now.getHours() > 6 && now.getHours() < 17)"
             break;
 
             case "Full Weekdays (8am-8pm)":
